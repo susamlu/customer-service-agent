@@ -273,7 +273,7 @@ def retrieve(req: RetrieveRequest) -> dict:
 def rerank(req: RerankRequest) -> dict:
     reranker = require("reranker")
     if not req.candidates:
-        return {"selected": [], "elapsed": 0.0}
+        return {"selected": [], "scorer": reranker.scorer, "elapsed": 0.0}
     t0 = time.perf_counter()
     selected = reranker.rank(req.query, req.candidates, req.top_k)
     return {
@@ -285,6 +285,8 @@ def rerank(req: RerankRequest) -> dict:
             }
             for item in selected
         ],
+        # noop 精排的 score 统一为 0，网关按 scorer 回填召回分，不把 0 当分数展示。
+        "scorer": reranker.scorer,
         "elapsed": round(time.perf_counter() - t0, 2),
     }
 

@@ -233,7 +233,14 @@ export default function TracePanel({ trace }: { trace: Trace }) {
       {trace.context && <ContextBlock context={trace.context} />}
       {trace.verdict && <VerdictBlock verdict={trace.verdict} />}
 
-      <CandidateList title="送入生成的知识（top 2）" items={trace.selected ?? []} />
+      <CandidateList
+        title={
+          trace.selectedScorer && trace.selectedScorer !== 'cross_encoder'
+            ? '送入生成的知识（top 2 · 召回分）'
+            : '送入生成的知识（top 2）'
+        }
+        items={trace.selected ?? []}
+      />
       <CandidateList title="召回候选 top 5" items={trace.candidates ?? []} />
     </aside>
   );

@@ -50,6 +50,8 @@ export interface Trace {
   verdict?: VerdictResult;
   candidates?: ScoredText[];
   selected?: ScoredText[];
+  /** selected 的分数来源：cross_encoder 是精排分，其余（noop / recall）是召回分。 */
+  selectedScorer?: string;
 }
 
 export interface OrderResult {
@@ -84,7 +86,7 @@ export type StreamEvent =
       elapsed: number;
     }
   | { type: 'retrieve'; candidates: ScoredText[]; elapsed: number }
-  | { type: 'rerank'; selected: ScoredText[]; elapsed: number }
+  | { type: 'rerank'; selected: ScoredText[]; scorer?: string; elapsed: number }
   | ({
       type: 'context';
     } & ContextInfo)

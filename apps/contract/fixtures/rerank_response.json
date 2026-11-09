@@ -11,5 +11,6 @@
       "score": 0.6103
     }
   ],
+  "scorer": "cross_encoder",
   "elapsed": 0.03
 }

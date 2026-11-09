@@ -205,6 +205,45 @@ class ChatOrchestratorTest {
     }
 
     @Test
+    @DisplayName("a noop rerank shows the recall score instead of the placeholder zero")
+    void noopRerank_backfillsRecallScore() throws IOException {
+        // noop 精排的 score 恒为 0（表示这一步没有精排），面板不能用它当分数。
+        givenPlan(List.of("knowledge"), Map.of());
+        when(client.retrieve(anyString(), anyInt(), any(), any())).thenReturn(json(
+                "{\"candidates\":[{\"text\":\"退款 7 天内原路退回\",\"intent\":\"knowledge\","
+                        + "\"score\":0.77}],\"elapsed\":0.01}"));
+        when(client.rerank(anyString(), anyList(), anyInt(), any())).thenReturn(json(
+                "{\"selected\":[{\"text\":\"退款 7 天内原路退回\",\"score\":0.0}],"
+                        + "\"scorer\":\"noop\",\"elapsed\":0.01}"));
+        givenGeneration("7 天内到账。");
+
+        run("退款多久到账");
+
+        JsonNode rerank = event("rerank");
+        assertThat(rerank.path("scorer").asText()).isEqualTo("noop");
+        assertThat(rerank.path("selected").get(0).path("score").asDouble()).isEqualTo(0.77);
+    }
+
+    @Test
+    @DisplayName("a cross-encoder rerank keeps its own score")
+    void crossEncoderRerank_keepsRerankScore() throws IOException {
+        givenPlan(List.of("knowledge"), Map.of());
+        when(client.retrieve(anyString(), anyInt(), any(), any())).thenReturn(json(
+                "{\"candidates\":[{\"text\":\"退款 7 天内原路退回\",\"intent\":\"knowledge\","
+                        + "\"score\":0.77}],\"elapsed\":0.01}"));
+        when(client.rerank(anyString(), anyList(), anyInt(), any())).thenReturn(json(
+                "{\"selected\":[{\"text\":\"退款 7 天内原路退回\",\"score\":0.8}],"
+                        + "\"scorer\":\"cross_encoder\",\"elapsed\":0.01}"));
+        givenGeneration("7 天内到账。");
+
+        run("退款多久到账");
+
+        JsonNode rerank = event("rerank");
+        assertThat(rerank.path("scorer").asText()).isEqualTo("cross_encoder");
+        assertThat(rerank.path("selected").get(0).path("score").asDouble()).isEqualTo(0.8);
+    }
+
+    @Test
     @DisplayName("previous turns are replayed so a follow-up can resolve its reference")
     void previousTurnsAreReplayed() throws IOException {
         store.addUser("s1", "订单 SO123456 到哪了");
@@ -285,7 +324,8 @@ class ChatOrchestratorTest {
                 "{\"candidates\":[{\"text\":\"" + text + "\",\"intent\":\"knowledge\","
                         + "\"score\":" + score + "}],\"elapsed\":0.01}"));
         when(client.rerank(anyString(), anyList(), anyInt(), any())).thenReturn(json(
-                "{\"selected\":[{\"text\":\"" + text + "\",\"score\":0.8}],\"elapsed\":0.01}"));
+                "{\"selected\":[{\"text\":\"" + text + "\",\"score\":0.8}],"
+                        + "\"scorer\":\"cross_encoder\",\"elapsed\":0.01}"));
     }
 
     private void givenGeneration(String reply) {

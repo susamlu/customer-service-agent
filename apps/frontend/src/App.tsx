@@ -237,7 +237,7 @@ export default function App() {
           break;
         case 'rerank':
           setStage('rerank', 'done', event.elapsed);
-          patchTrace({ selected: event.selected });
+          patchTrace({ selected: event.selected, selectedScorer: event.scorer });
           break;
         case 'context':
           patchTrace({

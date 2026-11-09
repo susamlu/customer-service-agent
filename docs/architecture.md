@@ -139,10 +139,16 @@ ticket/InvalidTicketStatusException.java
 ```
 
 ```json
-{ "selected": [ { "index": 0, "text": "...", "score": 0.88 } ], "elapsed": 0.31 }
+{
+  "selected": [ { "index": 0, "text": "...", "score": 0.88 } ],
+  "scorer": "cross_encoder",
+  "elapsed": 0.31
+}
 ```
 
-`index` 回指请求里 `candidates` 的下标；`text` 原样回传，省得网关再拼一次。线上默认 `NoopReranker`，`score` 统一 0，顺序即召回序。
+`index` 回指请求里 `candidates` 的下标；`text` 原样回传，省得网关再拼一次。
+
+`scorer` 标明 `score` 的来源：`cross_encoder` 是精排分；`noop` 表示这一步没有精排，`score` 统一 0（不是真实分数）。网关按 `scorer` 判断：非 `cross_encoder` 时按原文文本回填召回分，前端才不会把 0 当分数显示。
 
 ### 3.4 `POST /api/generate`
 
@@ -739,7 +745,7 @@ PYTHONPATH=apps:ml/runtime .venv/bin/python3 ml/experiments/eval_generation.py \
 ```
 plan      → capabilities / route_scores / topic / source / elapsed_ms
 retrieve  → 候选数与分数分布
-rerank    → 精筛前后顺序变化
+rerank    → 精筛前后顺序变化（scorer 标分数来源：精排分 / 召回分）
 context   → 最终注入的上下文来源与长度
 verdict   → 可答性三档 / 依据 / 首位分 / 阈值
 generate  → 首字延迟 / token 数 / 总耗时

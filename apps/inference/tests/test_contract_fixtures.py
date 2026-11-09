@@ -64,7 +64,8 @@ def test_retrieve_fixture_shape():
 def test_rerank_fixture_shape():
     payload = load("rerank_response.json")
 
-    assert set(payload) == {"selected", "elapsed"}
+    assert set(payload) == {"selected", "scorer", "elapsed"}
+    assert payload["scorer"] == "cross_encoder"
     assert payload["selected"]
     for item in payload["selected"]:
         assert set(item) == {"index", "text", "score"}

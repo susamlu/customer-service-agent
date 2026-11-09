@@ -45,14 +45,17 @@ def test_in_memory_maps_rows_to_retrieved():
 
 def test_cross_encoder_orders_by_score_desc():
     model = FakeCrossEncoder([0.2, 0.9, 0.5])
+    reranker = CrossEncoderReranker(model)
 
-    ranked = CrossEncoderReranker(model).rank("q", ["a", "b", "c"], 2)
+    ranked = reranker.rank("q", ["a", "b", "c"], 2)
 
     assert [(r.index, r.text, r.score) for r in ranked] == [
         (1, "b", 0.9),
         (2, "c", 0.5),
     ]
     assert model.calls == 1
+    # 网关据此判断 selected 的 score 是精排分还是召回分。
+    assert reranker.scorer == "cross_encoder"
 
 
 def test_cross_encoder_empty_candidates_skips_model():
@@ -62,12 +65,15 @@ def test_cross_encoder_empty_candidates_skips_model():
 
 
 def test_noop_preserves_recall_order_and_truncates():
-    ranked = NoopReranker().rank("q", ["a", "b", "c"], 2)
+    reranker = NoopReranker()
+    ranked = reranker.rank("q", ["a", "b", "c"], 2)
 
     assert [(r.index, r.text, r.score) for r in ranked] == [
         (0, "a", 0.0),
         (1, "b", 0.0),
     ]
+    # noop 不产出精排分，score 恒为 0；网关按 scorer 回填召回分。
+    assert reranker.scorer == "noop"
 
 
 def test_noop_handles_empty_candidates():

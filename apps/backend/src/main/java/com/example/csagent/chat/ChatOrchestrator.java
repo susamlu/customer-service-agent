@@ -18,6 +18,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -244,7 +245,8 @@ public class ChatOrchestrator {
             writeEvent(out, Map.of(
                     "type", "rerank",
                     "selected", knowledge.selected(),
-                    "elapsed", knowledge.rerankElapsed()));
+                    "elapsed", knowledge.rerankElapsed(),
+                    "scorer", knowledge.scorer()));
             if (knowledge.selectedTexts().isEmpty()) {
                 // 非故障（200，不可重试）：用常识回答即可，不弹错误气泡。
                 log.warn("RETRIEVAL_EMPTY session={} query={}", sessionId, query);
@@ -326,13 +328,17 @@ public class ChatOrchestrator {
         JsonNode retrieved = client.retrieve(query, RETRIEVE_TOP_K, topic, RETRIEVE_TIMEOUT);
         List<String> candidateTexts = new ArrayList<>();
         List<Map<String, Object>> candidates = new ArrayList<>();
+        // 召回分按原文留一份：noop 精排不产生分数，回填时按文本对上。
+        Map<String, Double> recallScores = new HashMap<>();
         for (JsonNode candidate : retrieved.path("candidates")) {
             String text = candidate.path("text").asText("");
+            double score = candidate.path("score").asDouble(0);
             candidateTexts.add(text);
+            recallScores.putIfAbsent(text, score);
             candidates.add(Map.<String, Object>of(
                     "text", brief(text),
                     "intent", candidate.path("intent").asText(""),
-                    "score", candidate.path("score").asDouble(0)));
+                    "score", score));
         }
         double retrieveElapsed = retrieved.path("elapsed").asDouble(0);
         metrics.capability(
@@ -340,7 +346,7 @@ public class ChatOrchestrator {
                 "retrieve",
                 candidateTexts.isEmpty() ? "empty" : "ok");
         if (candidateTexts.isEmpty()) {
-            return new Knowledge(candidates, List.of(), List.of(), retrieveElapsed, 0);
+            return new Knowledge(candidates, List.of(), List.of(), retrieveElapsed, 0, "recall");
         }
 
         long rerankStartedAt = System.nanoTime();
@@ -356,21 +362,28 @@ public class ChatOrchestrator {
                     candidates.stream().limit(RERANK_TOP_K).toList(),
                     candidateTexts.stream().limit(RERANK_TOP_K).toList(),
                     retrieveElapsed,
-                    0);
+                    0,
+                    "recall");
         }
         metrics.capability(Duration.ofNanos(System.nanoTime() - rerankStartedAt), "rerank", "ok");
+
+        // noop 精排的 score 统一为 0，不是真实分数：沿用召回分，面板才不会显示 0.000。
+        String scorer = reranked.path("scorer").asText("recall");
+        boolean hasRerankScore = "cross_encoder".equals(scorer);
 
         List<String> selectedTexts = new ArrayList<>();
         List<Map<String, Object>> selected = new ArrayList<>();
         for (JsonNode node : reranked.path("selected")) {
             String text = node.path("text").asText("");
+            double score = hasRerankScore
+                    ? node.path("score").asDouble(0)
+                    : recallScores.getOrDefault(text, 0.0);
             selectedTexts.add(text);
-            selected.add(Map.<String, Object>of(
-                    "text", brief(text), "score", node.path("score").asDouble(0)));
+            selected.add(Map.<String, Object>of("text", brief(text), "score", score));
         }
         return new Knowledge(
                 candidates, selected, selectedTexts, retrieveElapsed,
-                reranked.path("elapsed").asDouble(0));
+                reranked.path("elapsed").asDouble(0), scorer);
     }
 
     /** 一条能力链的产出：候选与精选各自保留"事件形态"和"原文"，前者给 UI，后者给生成。 */
@@ -379,7 +392,8 @@ public class ChatOrchestrator {
             List<Map<String, Object>> selected,
             List<String> selectedTexts,
             double retrieveElapsed,
-            double rerankElapsed) {}
+            double rerankElapsed,
+            String scorer) {}
 
     /**
      * 转人工：落一张工单再回执（§6）。

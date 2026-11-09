@@ -11,6 +11,9 @@ from inference.retrieval.base import Ranked
 
 
 class CrossEncoderReranker:
+    # /api/rerank 原样透传，网关据此判断 selected 的 score 是精排分还是召回分。
+    scorer = "cross_encoder"
+
     def __init__(self, model) -> None:
         self.model = model
 
@@ -28,6 +31,8 @@ class CrossEncoderReranker:
 
 
 class NoopReranker:
+    scorer = "noop"
+
     def rank(
         self, query: str, candidates: list[str], top_k: int
     ) -> list[Ranked]:
