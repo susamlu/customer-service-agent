@@ -1,0 +1,54 @@
+version: 1
+# 主题 → 候选能力集。训练标签的唯一来源，必须可审计、可 diff（architecture.md §4.3）。
+#
+# 派生规则：
+#   knowledge  回答需要通用政策 / 流程知识
+#   order      回答需要拉取该用户的具体订单 / 物流状态
+#   human      需要转人工
+#
+# order 是门控能力：请求没有订单号、且会话内也没有订单上下文时，会被
+# CapabilityPlanner 裁掉（§4.4）。所以订单邻近的主题宁可多标 order ——
+# 多标是安全的（门控会拦），漏标会让订单问题掉进知识库通路，答成泛泛的
+# 政策话术，用户拿不到自己的物流状态。
+topics:
+  PLUS会员:            [knowledge]
+  什么时间出库:         [order, knowledge]   # 查发货进度 + 发货时效政策
+  价保条件:             [knowledge]
+  价保申请流程:         [knowledge]
+  使用咨询:             [knowledge]
+  保修返修及退换货政策: [knowledge]
+  修改订单:             [order, knowledge]   # 改单操作依赖订单当前状态
+  其他:                 [knowledge]          # 长尾兜底走知识库
+  发票退换修改:         [order, knowledge]   # 针对某笔订单的发票操作
+  售前运费多少:         [knowledge]
+  售后运费:             [knowledge]
+  商品价格咨询:         [knowledge]
+  增票相关:             [knowledge]
+  如何取消订单:         [order, knowledge]   # 取消操作依赖订单状态
+  家电安装:             [knowledge]
+  少商品与少配件:       [order, knowledge]   # 需核对订单行项目
+  属性咨询:             [knowledge]
+  库存状态:             [knowledge]
+  手机邮件相关问题:     [knowledge]
+  拒收:                 [order, knowledge]
+  是否提供发票:         [knowledge]
+  服务单查询:           [order, knowledge]   # 服务单号与订单号不同源，门控兜底
+  查看发票:             [order, knowledge]
+  查询取消是否成功:     [order]              # 纯订单状态查询，无知识可讲
+  正常退款周期:         [knowledge]
+  物流全程跟踪:         [order, knowledge]   # 查物流 + 讲时效政策
+  申请退款:             [order, knowledge]
+  联系客户:             [human]
+  联系客服:             [human]
+  联系配送:             [human]
+  补货时间:             [knowledge]
+  订单状态解释:         [order]
+  订单签收异常:         [order, knowledge]   # 先查签收轨迹，再给申诉流程
+  货到付款:             [knowledge]
+  近期活动咨询:         [knowledge]
+  返修退换货处理周期:   [knowledge]
+  返回方式:             [knowledge]
+  退款到哪儿:           [knowledge]
+  配送周期:             [knowledge]
+  配送方式:             [knowledge]
+  预约配送时间:         [order, knowledge]

@@ -1,0 +1,59 @@
+[
+  {
+    "logisticsId": "lg_airpods",
+    "carrier": "顺丰速运",
+    "trackingNo": "SF1366660001",
+    "traces": [
+      { "daysAgo": 9, "location": "深圳龙岗仓", "desc": "商家已发货" },
+      { "daysAgo": 8, "location": "深圳转运中心", "desc": "已发出，下一站杭州" },
+      { "daysAgo": 2, "location": "杭州滨江营业点", "desc": "包裹滞留，等待派送" }
+    ]
+  },
+  {
+    "logisticsId": "lg_normal",
+    "carrier": "中通快递",
+    "trackingNo": "ZT7531200",
+    "traces": [
+      { "daysAgo": 20, "location": "广州转运中心", "desc": "商家已发货" },
+      { "daysAgo": 18, "location": "杭州滨江营业点", "desc": "已签收，签收人：本人" }
+    ]
+  },
+  {
+    "logisticsId": "lg_cases",
+    "carrier": "圆通速递",
+    "trackingNo": "YT9901100",
+    "traces": [
+      { "daysAgo": 12, "location": "义乌转运中心", "desc": "商家已发货" },
+      { "daysAgo": 10, "location": "杭州九堡营业点", "desc": "已签收，签收人：驿站代收" }
+    ]
+  },
+  {
+    "logisticsId": "lg_monitor",
+    "carrier": "京东物流",
+    "trackingNo": "JD0004455",
+    "traces": [
+      { "daysAgo": 12, "location": "上海亚一仓", "desc": "商家已发货" },
+      { "daysAgo": 10, "location": "杭州下沙营业点", "desc": "已签收，签收人：本人" }
+    ]
+  },
+  {
+    "logisticsId": "lg_baby",
+    "carrier": "韵达快递",
+    "trackingNo": "YD3307700",
+    "traces": [
+      { "daysAgo": 4, "location": "宁波转运中心", "desc": "商家已发货" },
+      { "daysAgo": 3, "location": "杭州西湖区文新点", "desc": "已签收，签收人：本人" }
+    ]
+  },
+  {
+    "logisticsId": "lg_refund",
+    "carrier": "顺丰速运",
+    "trackingNo": "SF1367770002",
+    "traces": [
+      { "daysAgo": 6, "location": "杭州滨江仓", "desc": "商家已发货" },
+      { "daysAgo": 5, "location": "杭州滨江营业点", "desc": "买家拒收，包裹退回" },
+      { "daysAgo": 4, "location": "杭州转运中心", "desc": "退回件运输中" },
+      { "daysAgo": 3, "location": "杭州滨江退货仓", "desc": "退货仓库已签收，待验收" }
+    ]
+  }
+]

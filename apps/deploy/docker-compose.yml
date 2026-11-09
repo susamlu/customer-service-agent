@@ -1,0 +1,74 @@
+# 完整容器化形态：模型服务 + Spring Boot 网关（前端已打进网关 jar）。
+#
+# 生成固定走 DeepSeek；模型服务只常驻 BERT + bge，不加载本地大模型，
+# 默认不加载精排 reranker（1.1GB，见 docs/experiments.md「rerank 取舍消融」）。
+# DEEPSEEK_API_KEY 必填，缺失时模型服务启动失败。
+#
+# 从本目录执行 docker compose，构建上下文是项目根（..）。
+# 首次启动前确认 ml/models/ 下已有底座与微调产物（见 README「环境准备」）。
+services:
+  model-service:
+    build:
+      context: ..
+      dockerfile: apps/deploy/inference.Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../ml/models:/app/ml/models:ro
+      - ../ml/data:/app/ml/data:ro
+    environment:
+      - OMP_NUM_THREADS=4
+      # 必填：缺 key 时模型服务启动失败（不做本地降级）。
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:?DEEPSEEK_API_KEY is required}
+      # 留空则召回走进程内 InMemory；指向 pgvector 时改用数据库索引查询（§7）。
+      # 容器内地址用服务名，如 postgresql://csagent:csagent@postgres:5432/csagent。
+      - DATABASE_URL=${DATABASE_URL:-}
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request;urllib.request.urlopen('http://127.0.0.1:8000/healthz')"]
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 120s
+    deploy:
+      resources:
+        # 常驻只有 BERT + bge（默认不加载精排）；4g 留出容器与推理峰值余量。
+        limits:
+          memory: 4g
+
+  gateway:
+    build:
+      context: ..
+      dockerfile: apps/deploy/backend.Dockerfile
+    ports:
+      - "8090:8090"
+    environment:
+      - MODEL_SERVICE_URL=http://model-service:8000
+    depends_on:
+      model-service:
+        condition: service_healthy
+
+  # 可选：pgvector 向量库（§7）。默认不启动，需要时显式带 profile：
+  #   DATABASE_URL=postgresql://csagent:csagent@postgres:5432/csagent \
+  #     docker compose --profile pgvector up -d
+  # 灌数据用 ml/experiments/build_vector_index.py（本机跑时把 host 换 localhost）。
+  # 不设 depends_on：postgres 在 profile 里，未激活时模型服务照常以 InMemory 启动。
+  postgres:
+    image: pgvector/pgvector:pg16
+    profiles: ["pgvector"]
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=csagent
+      - POSTGRES_PASSWORD=csagent
+      - POSTGRES_DB=csagent
+    volumes:
+      - pgvector-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U csagent -d csagent"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  pgvector-data:

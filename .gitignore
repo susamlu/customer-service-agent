@@ -1,0 +1,29 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Node
+node_modules/
+
+# Java
+target/
+
+# 运行期数据与本地状态
+apps/backend/data/
+.gstack/
+.claude/settings.local.json
+*.log
+.DS_Store
+tsconfig.tsbuildinfo
+
+# 原始数据集：外部 CSDS 语料（69M），CI 不跑 build_dataset
+ml/data/raw/
+
+# 模型权重（约 3G，走 ModelScope 下载）
+# 仅放行 check_capability_map.py 需要的 config.json
+ml/models/*
+!ml/models/intent-multitask-bert/
+ml/models/intent-multitask-bert/*
+!ml/models/intent-multitask-bert/config.json

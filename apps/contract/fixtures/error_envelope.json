@@ -1,0 +1,5 @@
+{
+  "code": "UPSTREAM_RATE_LIMITED",
+  "message": "上游模型限流，请稍后重试。",
+  "retriable": true
+}

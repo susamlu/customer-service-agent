@@ -1,0 +1,102 @@
+[
+  {
+    "productId": "p_airpods6",
+    "name": "AirPods Pro 3 降噪耳机",
+    "category": "数码配件",
+    "price": 1899.0,
+    "supportsPriceProtection": true,
+    "priceProtectionDays": 7,
+    "sevenDayReturn": true,
+    "returnCondition": "不影响二次销售"
+  },
+  {
+    "productId": "p_case29",
+    "name": "透明防摔手机壳（iPhone 16）",
+    "category": "手机配件",
+    "price": 29.0,
+    "supportsPriceProtection": false,
+    "priceProtectionDays": 0,
+    "sevenDayReturn": true,
+    "returnCondition": "不影响二次销售"
+  },
+  {
+    "productId": "p_monitor27",
+    "name": "27 寸 4K 显示器",
+    "category": "电脑外设",
+    "price": 2199.0,
+    "supportsPriceProtection": true,
+    "priceProtectionDays": 7,
+    "sevenDayReturn": true,
+    "returnCondition": "屏幕无划痕、包装配件齐全"
+  },
+  {
+    "productId": "p_babymaker",
+    "name": "婴儿辅食料理机",
+    "category": "厨房小电",
+    "price": 399.0,
+    "supportsPriceProtection": true,
+    "priceProtectionDays": 7,
+    "sevenDayReturn": true,
+    "returnCondition": "不影响二次销售"
+  },
+  {
+    "productId": "p_console",
+    "name": "新款游戏主机（预售）",
+    "category": "游戏设备",
+    "price": 3599.0,
+    "supportsPriceProtection": false,
+    "priceProtectionDays": 0,
+    "sevenDayReturn": false,
+    "returnCondition": "预售商品不支持无理由退货"
+  },
+  {
+    "productId": "p_downjacket",
+    "name": "轻薄羽绒服 90 白鸭绒",
+    "category": "女装",
+    "price": 899.0,
+    "supportsPriceProtection": true,
+    "priceProtectionDays": 15,
+    "sevenDayReturn": true,
+    "returnCondition": "吊牌完整、未穿着"
+  },
+  {
+    "productId": "p_robot",
+    "name": "扫地机器人 X20",
+    "category": "家电",
+    "price": 2499.0,
+    "supportsPriceProtection": true,
+    "priceProtectionDays": 15,
+    "sevenDayReturn": true,
+    "returnCondition": "不影响二次销售"
+  },
+  {
+    "productId": "p_skincare",
+    "name": "保湿修护面霜 50g",
+    "category": "美妆个护",
+    "price": 259.0,
+    "supportsPriceProtection": false,
+    "priceProtectionDays": 0,
+    "sevenDayReturn": true,
+    "returnCondition": "未拆封"
+  },
+  {
+    "productId": "p_deskchair",
+    "name": "人体工学椅",
+    "category": "家具",
+    "price": 1299.0,
+    "supportsPriceProtection": true,
+    "priceProtectionDays": 30,
+    "sevenDayReturn": true,
+    "returnCondition": "不影响二次销售"
+  },
+  {
+    "productId": "p_snacks",
+    "name": "手工牛轧糖礼盒",
+    "category": "食品",
+    "price": 89.0,
+    "supportsPriceProtection": false,
+    "priceProtectionDays": 0,
+    "sevenDayReturn": false,
+    "returnCondition": "食品类不支持无理由退货"
+  }
+]

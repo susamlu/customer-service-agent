@@ -1,0 +1,171 @@
+name: ci
+
+# 质量层（architecture.md §10.2 / T14）。
+#
+# PR 与 push：
+#   - backend     Java 单测 + Java ↔ Python 契约测试
+#   - inference   Python 单测（Provider 矩阵、门控、意图、检索）
+#   - capability  主题→能力映射完整性与路由评测集不变量
+#
+# 每晚 / 手动（模型权重不在 PR 缓存里，避免每次 PR 拉 400MB）：
+#   - eval        route / rerank / retrieval 三条评估门槛，任一不达标非零退出
+#   - e2e         真实栈 HTTP/SSE 黑盒（订单 / 知识 / 转人工 / 并行）
+#
+# 模型权重通过 Git LFS 或 CI 缓存落到 ml/models/；缺失时 eval 任务直接失败，
+# 不允许静默跳过，否则门槛形同虚设。
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "23 18 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.11"
+  JAVA_VERSION: "17"
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+      - name: Build and test
+        run: mvn -B test
+
+  inference:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: apps/inference/requirements-dev.txt
+      - name: Install dependencies
+        run: pip install -r apps/inference/requirements-dev.txt
+      - name: Run tests
+        env:
+          PYTHONPATH: apps:ml/runtime
+        run: python -m pytest apps/inference/tests -q
+
+  capability:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      # 纯文件校验，不加载模型：映射表缺键、评测集结构破坏都应在 PR 阶段拦住。
+      # 仍需模型 config.json 提供主题标签，因此权重走 Git LFS。
+      - name: Install checker dependency
+        run: pip install pyyaml
+      - name: Check capability map covers every topic label
+        run: python ml/experiments/check_capability_map.py
+
+  eval:
+    # 重量级门禁：只在定时任务和手动触发时跑，PR 保持分钟级反馈。
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: apps/inference/requirements-dev.txt
+      - name: Install dependencies
+        run: pip install -r apps/inference/requirements-dev.txt
+      - name: Require model weights
+        run: |
+          if [ ! -f ml/models/intent-multitask-bert/config.json ]; then
+            echo "::error::缺少 ml/models/intent-multitask-bert，评估门槛无法执行。请用 Git LFS 或 CI 缓存提供权重。"
+            exit 1
+          fi
+      - name: Route gate (boundary R ≥ 0.85 / heldout subset ≥ 0.80 / order P ≥ 0.88 / human R ≥ 0.75)
+        run: python ml/experiments/eval_router.py
+      - name: Rerank gate (pairwise ≥ 0.774)
+        run: python ml/experiments/eval_rerank.py --model ml/models/rerank-finetuned --device cpu
+      - name: Retrieval gate (served recall@10 ≥ 0.68; KB=qa_train, router topic +0.05)
+        run: python ml/experiments/eval_retrieval.py --device cpu
+
+  e2e:
+    # 真实栈黑盒（architecture.md §10.2）：网关 + 模型服务，HTTP/SSE 全链路。
+    # 只在定时任务和手动触发时跑。生成走 DeepSeek（§3 内存目标），
+    # 权重或 key 缺失直接失败，不允许静默跳过。
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: apps/inference/requirements-dev.txt
+      - name: Install dependencies
+        run: pip install -r apps/inference/requirements-dev.txt
+      - name: Require weights and DeepSeek key
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          for path in \
+            ml/models/intent-multitask-bert/config.json \
+            ml/models/rerank-finetuned \
+            ml/models/models/BAAI--bge-small-zh-v1.5; do
+            if [ ! -e "$path" ]; then
+              echo "::error::缺少 $path，E2E 无法执行。请用 Git LFS 或 CI 缓存提供权重。"
+              exit 1
+            fi
+          done
+          if [ -z "$DEEPSEEK_API_KEY" ]; then
+            echo "::error::缺少 DEEPSEEK_API_KEY secret，E2E 生成链路无法执行。"
+            exit 1
+          fi
+      - name: Start model service
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          PYTHONPATH=apps:ml/runtime nohup python -m uvicorn inference.model_service:app \
+            --host 127.0.0.1 --port 8000 > /tmp/model.log 2>&1 &
+          for _ in $(seq 1 90); do
+            curl -s --max-time 2 http://127.0.0.1:8000/healthz | grep -q '"ready"' && break
+            sleep 2
+          done
+          curl -s http://127.0.0.1:8000/healthz | grep -q '"ready"' || { tail -80 /tmp/model.log; exit 1; }
+      - name: Start gateway
+        run: |
+          nohup mvn -q -B -f apps/backend/pom.xml spring-boot:run > /tmp/gateway.log 2>&1 &
+          for _ in $(seq 1 60); do
+            curl -s --max-time 2 http://127.0.0.1:8090/api/model-status | grep -q '"ready"' && break
+            sleep 2
+          done
+          curl -s --max-time 2 http://127.0.0.1:8090/api/model-status | grep -q '"ready"' || { tail -80 /tmp/gateway.log; exit 1; }
+      - name: Run E2E (real stack, SSE black box)
+        env:
+          E2E_REQUIRED: "1"
+          E2E_READY_TIMEOUT: "60"
+        run: PYTHONPATH=apps:ml/runtime python -m pytest apps/e2e -q

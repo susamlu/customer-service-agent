@@ -1,0 +1,27 @@
+{
+  "capabilities": ["knowledge", "order"],
+  "route_scores": {
+    "knowledge": 0.86,
+    "order": 0.91,
+    "human": 0.02
+  },
+  "topic": {
+    "label": "物流",
+    "confidence": 0.7342
+  },
+  "entities": {
+    "orderId": "SO123456"
+  },
+  "gate": {
+    "knowledge": {
+      "allowed": true,
+      "reason": "always"
+    },
+    "order": {
+      "allowed": true,
+      "reason": "order_id_present"
+    }
+  },
+  "source": "bert",
+  "elapsed_ms": 12.4
+}

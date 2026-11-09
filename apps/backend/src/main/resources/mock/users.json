@@ -1,0 +1,50 @@
+[
+  {
+    "userId": "u_chen",
+    "name": "陈晓婷",
+    "nickname": "晓婷",
+    "tier": "gold",
+    "registeredDaysAgo": 720,
+    "orderIds": ["SO2026102901", "SO2026101802"]
+  },
+  {
+    "userId": "u_zhao",
+    "name": "赵磊",
+    "nickname": "小磊",
+    "tier": "regular",
+    "registeredDaysAgo": 180,
+    "orderIds": ["SO2026102603", "SO2026102604"]
+  },
+  {
+    "userId": "u_wang",
+    "name": "王芳",
+    "nickname": "阿芳",
+    "tier": "silver",
+    "registeredDaysAgo": 1095,
+    "orderIds": ["SO2026110305"]
+  },
+  {
+    "userId": "u_liu",
+    "name": "刘洋",
+    "nickname": "阿洋",
+    "tier": "regular",
+    "registeredDaysAgo": 90,
+    "orderIds": ["SO2026110506"]
+  },
+  {
+    "userId": "u_sun",
+    "name": "孙悦",
+    "nickname": "悦悦",
+    "tier": "platinum",
+    "registeredDaysAgo": 1460,
+    "orderIds": ["SO2026110107"]
+  },
+  {
+    "userId": "u_zhou",
+    "name": "周杰",
+    "nickname": "小周",
+    "tier": "regular",
+    "registeredDaysAgo": 30,
+    "orderIds": []
+  }
+]

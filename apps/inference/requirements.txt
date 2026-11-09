@@ -1,0 +1,13 @@
+numpy
+scikit-learn
+torch
+transformers
+sentence-transformers
+accelerate
+fastapi
+uvicorn[standard]
+httpx
+prometheus-client
+# pgvector 召回（§7）：仅 DATABASE_URL 存在时才加载，InMemory 路径不依赖。
+psycopg[binary]>=3.2
+pgvector>=0.3

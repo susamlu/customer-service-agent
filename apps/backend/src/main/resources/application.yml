@@ -1,0 +1,47 @@
+server:
+  port: 8090
+
+model:
+  service:
+    base-url: ${MODEL_SERVICE_URL:http://127.0.0.1:8000}
+
+guard:
+  # 留空 = 关闭鉴权（本地/演示默认）；线上必须通过环境变量注入。
+  api-token: ${GUARD_API_TOKEN:}
+  rate-limit-per-minute: ${GUARD_RATE_LIMIT_PER_MINUTE:20}
+  max-body-bytes: ${GUARD_MAX_BODY_BYTES:4096}
+  max-session-id-length: 64
+
+spring:
+  mvc:
+    async:
+      # 流式生成可能持续 1-2 分钟
+      request-timeout: 300000
+  jackson:
+    default-property-inclusion: non_null
+  # 工单闭环（§6）。本地用文件库，重启不丢；线上换 PostgreSQL 只需改 url 与驱动。
+  datasource:
+    url: ${TICKET_DB_URL:jdbc:h2:file:./data/tickets;AUTO_SERVER=TRUE}
+    driver-class-name: org.h2.Driver
+    username: ${TICKET_DB_USER:sa}
+    password: ${TICKET_DB_PASSWORD:}
+  sql:
+    init:
+      # schema.sql 全是 IF NOT EXISTS，重复执行幂等。
+      mode: always
+      schema-locations: classpath:schema.sql
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  metrics:
+    distribution:
+      # 直方图让 Prometheus 能用 histogram_quantile 算 P95（§11 的门槛口径）
+      percentiles-histogram:
+        http.server.requests: true
+
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%X{traceId:-}] %logger{36} - %msg%n"

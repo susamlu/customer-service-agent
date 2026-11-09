@@ -1,0 +1,190 @@
+{"query": "审核需要时间，是吗 我申请退单了你这边审核一下", "label": "in_kb", "provenance": "qa_test", "note": "审核时效"}
+{"query": "我这个订单退了，怎么优惠券没退", "label": "in_kb", "provenance": "qa_test", "note": "优惠券退回"}
+{"query": "我前面点了试用会员 下个月自动扣费吗 ?", "label": "in_kb", "provenance": "qa_test", "note": "PLUS会员"}
+{"query": "那现在这样就一定能退吧 ? 如果到时候发了我就拒收对吗", "label": "in_kb", "provenance": "qa_test", "note": "保修返修及退换货政策"}
+{"query": "快递发出去了 单号给你 麻烦你帮我填一下 [姓名] 快递", "label": "in_kb", "provenance": "qa_test", "note": "修改订单"}
+{"query": "我想要一箱 一箱怎么拍", "label": "in_kb", "provenance": "qa_test", "note": "补货时间"}
+{"query": "我想要纸质的", "label": "in_kb", "provenance": "qa_test", "note": "发票退换修改"}
+{"query": "https : / / item . jd . com / 4212876 . html 这个商品能追加评价吗", "label": "in_kb", "provenance": "qa_test", "note": "如何评价晒单"}
+{"query": "那我就是拒收收就可以了，对吧", "label": "in_kb", "provenance": "qa_test", "note": "拒收"}
+{"query": "朋友代付的订单取消的话退款退到哪里", "label": "in_kb", "provenance": "qa_test", "note": "退款到哪儿"}
+{"query": "需要插流量卡 ?", "label": "in_kb", "provenance": "qa_test", "note": "属性咨询"}
+{"query": "你好，昨天在京东自营的都市丽人拍了几件内衣，如果码数不合适语言换的话，运费是怎样的呢 所以想知道，我到时候是要拒收还是怎样", "label": "in_kb", "provenance": "qa_test", "note": "保修返修及退换货政策"}
+{"query": "厂家电话多少", "label": "in_kb", "provenance": "qa_test", "note": "联系商家"}
+{"query": "不想要了不喜欢 需要退货 退货问题", "label": "in_kb", "provenance": "qa_test", "note": "保修返修及退换货政策"}
+{"query": "我买的生鲜水饺可以用箱子帮我打包好吗", "label": "in_kb", "provenance": "qa_test", "note": "外包装"}
+{"query": "你好这个订单我们已经付款了麻烦你核查下 没问题的话麻烦帮忙发货谢谢", "label": "in_kb", "provenance": "qa_test", "note": "什么时间出库"}
+{"query": "亲京享值在哪查啊、", "label": "in_kb", "provenance": "qa_test", "note": "普通会员"}
+{"query": "我是 plus 会员拥有一次退换无忧服务", "label": "in_kb", "provenance": "qa_test", "note": "运费险咨询"}
+{"query": "我这个京东手机号之前就已经注销了收不到验证码 能不能换掉我现在用的", "label": "in_kb", "provenance": "qa_test", "note": "手机邮件相关问题"}
+{"query": "怎么选择", "label": "in_kb", "provenance": "qa_test", "note": "购物流程"}
+{"query": "我想问下，买避孕套快递包装看得出来吗", "label": "in_kb", "provenance": "qa_test", "note": "外包装"}
+{"query": "那他收到系统会自动退钱吧", "label": "in_kb", "provenance": "qa_test", "note": "拒收"}
+{"query": "帮我改地址", "label": "in_kb", "provenance": "qa_test", "note": "修改订单"}
+{"query": "对了我下单能收到东西嘛，他没回我", "label": "in_kb", "provenance": "qa_test", "note": "配送周期"}
+{"query": "收件人和手机号被我写成女朋友的了，东西是送给她的但不是现在，我该怎么办", "label": "in_kb", "provenance": "qa_test", "note": "订单签收异常"}
+{"query": "显示采购中啊 ? ? ? 这是什么情况 ?", "label": "in_kb", "provenance": "qa_test", "note": "补货时间"}
+{"query": "这个秒杀价比会员价还贵 麻烦补差价", "label": "in_kb", "provenance": "qa_test", "note": "价保申请流程"}
+{"query": "我申请的退货还没处理吗 ? 返修退换货咨询", "label": "in_kb", "provenance": "qa_test", "note": "返修退换货处理周期"}
+{"query": "到店安装如何收费", "label": "in_kb", "provenance": "qa_test", "note": "安装收费"}
+{"query": "什么时候能发货 我昨天晚上就下订了", "label": "in_kb", "provenance": "qa_test", "note": "什么时间出库"}
+{"query": "请问这是店铺入驻时要提交还是发布商品时提交", "label": "in_kb", "provenance": "qa_test", "note": "商家入驻条件"}
+{"query": "京东快递吗", "label": "in_kb", "provenance": "qa_test", "note": "配送方式"}
+{"query": "忘记填写发票信息了 可以帮忙添加上开票信息不", "label": "in_kb", "provenance": "qa_test", "note": "填写发票信息"}
+{"query": "能帮我把 [数字] 单元改成 [数字] 单元 我订单地址改错了", "label": "in_kb", "provenance": "qa_test", "note": "修改订单"}
+{"query": "这个今天就满减降价了 我拍了两单，怎么处理呢 ?", "label": "in_kb", "provenance": "qa_test", "note": "价保申请流程"}
+{"query": "默认几个盘 ?", "label": "in_kb", "provenance": "qa_test", "note": "包装清单"}
+{"query": "什么时候来取货", "label": "in_kb", "provenance": "qa_test", "note": "返回方式"}
+{"query": "你们电源插哪里 这款适合 [数字] 大众途安 L 吗", "label": "in_kb", "provenance": "qa_test", "note": "属性咨询"}
+{"query": "我想问一下可不可以开纸质的增值税专用发票。 下来该怎样操作 资质审核通过了 要怎么操作", "label": "in_kb", "provenance": "qa_test", "note": "增票相关"}
+{"query": "您发的这个收件人电话是京东客服电话，就联系这个吗 ?", "label": "in_kb", "provenance": "qa_test", "note": "联系客服"}
+{"query": "这个灯不亮 刚买的 我申请退了又买一个", "label": "in_kb", "provenance": "qa_test", "note": "保修返修及退换货政策"}
+{"query": "我的订单怎么被取消了 我的订单怎么被取消了 [订单编号] 这个订单怎么被取消了 我都没点取消，怎么给我取消了 咨询订单号 : [订单编号] 太无耻了，没经过我同意就取消订单", "label": "in_kb", "provenance": "qa_test", "note": "订单无故取消"}
+{"query": "我在京东上买的鞋子 没有收到有人签收了", "label": "in_kb", "provenance": "qa_test", "note": "订单签收异常"}
+{"query": "已经重新拍好 [数字] 的手机壳", "label": "in_kb", "provenance": "qa_test", "note": "拒收"}
+{"query": "专票的快递单会给我嘛 ?", "label": "in_kb", "provenance": "qa_test", "note": "查看发票"}
+{"query": "奶粉太慢了我给孩子换一段的了，这个可以退吗", "label": "in_kb", "provenance": "qa_test", "note": "保修返修及退换货政策"}
+{"query": "没有联系方式吗", "label": "in_kb", "provenance": "qa_test", "note": "修改订单"}
+{"query": "我想重新开一下发票", "label": "in_kb", "provenance": "qa_test", "note": "发票退换修改"}
+{"query": "我这个下单时间大概需要多久", "label": "in_kb", "provenance": "qa_test", "note": "使用咨询"}
+{"query": "我的宝贝明天能不能送到 ?", "label": "in_kb", "provenance": "qa_test", "note": "配送周期"}
+{"query": "我想把送货时间改到 [数字] 月 [数字] 日可以吗 ?", "label": "in_kb", "provenance": "qa_test", "note": "修改订单"}
+{"query": "怎么还没充上", "label": "in_kb", "provenance": "qa_test", "note": "充值未到账充值到账时间"}
+{"query": "快递什么时候到", "label": "in_kb", "provenance": "qa_test", "note": "配送周期"}
+{"query": "那现在怎么处理 ?", "label": "in_kb", "provenance": "qa_test", "note": "保修返修及退换货政策"}
+{"query": "那差价直接退给我么 ? 那取货时间是联系我之后再取么 ?", "label": "in_kb", "provenance": "qa_test", "note": "预约配送时间"}
+{"query": "这快递是不是有问题呢，我在宁波 [地址] ，最开始都送到宁波分拣中心了，怎么又送往北京 [地址] 这快递是不是有问题呢，我在宁波 [地址] ，最开始都送到宁波分拣中心了，怎么又送往北京 [地址]", "label": "in_kb", "provenance": "qa_test", "note": "物流信息不正确"}
+{"query": "我买的橙子拍错了。是两份芒果一份橙子能修改吗 我买的橙子拍错了。是两份芒果一份橙子能修改吗", "label": "in_kb", "provenance": "qa_test", "note": "修改订单"}
+{"query": "如果抬头是企业的，只能改为相同抬头的增票是么", "label": "in_kb", "provenance": "qa_test", "note": "发票退换修改"}
+{"query": "我前几天在美的买了个破壁机然后因为旋转通电卡口太紧他们建议我申请售后换货 然后我也提交申请了 两天了还没有通过 我想问下什么时候可以处理", "label": "in_kb", "provenance": "qa_test", "note": "审核时效"}
+{"query": "已经极速退款了 但商品包装没有说明书 说好今天跟我回复解决的还没有收到信息 能退吗", "label": "in_kb", "provenance": "qa_test", "note": "正常退款周期"}
+{"query": "您好哦， [数字] 这是您们京东快递的服务单号吗 物流单号哦", "label": "in_kb", "provenance": "qa_test", "note": "服务单查询"}
+{"query": "如果不能修改，可以退货吧。", "label": "in_kb", "provenance": "qa_test", "note": "如何取消订单"}
+{"query": "今天买了两箱尿不湿可以退货吧 申请退货重新购买，你们只发一箱过来可以吗 ? 好的，免费上门拿货的吧", "label": "in_kb", "provenance": "qa_test", "note": "保修返修及退换货政策"}
+{"query": "还可以联系收件吗 ?", "label": "in_kb", "provenance": "qa_test", "note": "联系客户"}
+{"query": "[电话] 快递到站点了没联系顾客就显示拒收了顾客着急要手机呢帮忙联系下配送 好的尽快哦", "label": "in_kb", "provenance": "qa_test", "note": "订单签收异常"}
+{"query": "多久才进货啊", "label": "in_kb", "provenance": "qa_test", "note": "补货时间"}
+{"query": "我的意思是这个是不是能准时送到 我想知道我每天晚上十点回到家的话这个可以十点送达么", "label": "in_kb", "provenance": "qa_test", "note": "预约配送时间"}
+{"query": "那支票上的识别码就不用填写了对吧", "label": "in_kb", "provenance": "qa_test", "note": "支付密码"}
+{"query": "不确定什么时候有货是吧 ?", "label": "in_kb", "provenance": "qa_test", "note": "补货时间"}
+{"query": "我这单价格保护是不是已经申请成功了", "label": "in_kb", "provenance": "qa_test", "note": "价保记录查询"}
+{"query": "请问你们京东总部电话多少", "label": "in_kb", "provenance": "qa_test", "note": "联系客服"}
+{"query": "现在店铺还有优惠卷吗", "label": "in_kb", "provenance": "qa_test", "note": "优惠券获得方式"}
+{"query": "我昨天找客服， [数字] 小时内处理，电话联系我，到现在都没有收到信息 ? ?", "label": "in_kb", "provenance": "qa_test", "note": "联系配送"}
+{"query": "收获以后你们重新发过来发票 ? 订单完成后修改 ?", "label": "in_kb", "provenance": "qa_test", "note": "发票退换修改"}
+{"query": "怎么发往别的学校 不是发到我学校地址吗 ? 我学校也有京东派啊", "label": "in_kb", "provenance": "qa_test", "note": "物流信息不正确"}
+{"query": "一般专票都是京东提供的呢 这个是增值税专票 这样么 ?", "label": "in_kb", "provenance": "qa_test", "note": "增票相关"}
+{"query": "回收是京东上门取件吗", "label": "in_kb", "provenance": "qa_test", "note": "返回方式"}
+{"query": "你好，我要退货", "label": "in_kb", "provenance": "qa_test", "note": "保修返修及退换货政策"}
+{"query": "我问下这个电脑可以加装一块固态硬盘的吧 ? 想装一个的，记得介绍里有说可以的怎么这次看没了关于固态的介绍。", "label": "in_kb", "provenance": "qa_test", "note": "使用咨询"}
+{"query": "可为啥没货了呀 ?", "label": "in_kb", "provenance": "qa_test", "note": "为什么显示无货"}
+{"query": "你将专员电话号码给我，我跟他说", "label": "in_kb", "provenance": "qa_test", "note": "联系客服"}
+{"query": "我的这个手机号有问题，给你留个座机号 : [电话]", "label": "in_kb", "provenance": "qa_test", "note": "服务单查询"}
+{"query": "物流显示不", "label": "in_kb", "provenance": "qa_test", "note": "物流全程跟踪"}
+{"query": "您好，我要还开增值税专用发票 是的，原来是普通发票， 换开专票，资质已经上传了，", "label": "in_kb", "provenance": "qa_test", "note": "增票相关"}
+{"query": "您好我那个 [数字] 个可以先取消吗 想 [数字] 个一起拍一起送到 能先取消订单吗", "label": "in_kb", "provenance": "qa_test", "note": "如何取消订单"}
+{"query": "现在我直接申请有货先发也行是吧", "label": "in_kb", "provenance": "qa_test", "note": "拆分订单"}
+{"query": "我多个订单可以一起办理吗", "label": "in_kb", "provenance": "qa_test", "note": "购物流程"}
+{"query": "配送员送过来我要是收了，会显示订单完成吗", "label": "in_kb", "provenance": "qa_test", "note": "拒收"}
+{"query": "刚才我点错了点成了退款 你们这边可以帮忙恢复一下吗", "label": "in_kb", "provenance": "qa_test", "note": "取消退款"}
+{"query": "另外一个到了没有", "label": "in_kb", "provenance": "qa_test", "note": "物流全程跟踪"}
+{"query": "我有个订单。说是没预约通给我延期了", "label": "in_kb", "provenance": "qa_test", "note": "预约配送时间"}
+{"query": "这个降价了为什么不能保价", "label": "in_kb", "provenance": "qa_test", "note": "价保条件"}
+{"query": "抬头可以改么 ? 还是到时再打 ?", "label": "in_kb", "provenance": "qa_test", "note": "发票退换修改"}
+{"query": "VC [数字] 这件是被退回了吗", "label": "in_kb", "provenance": "qa_test", "note": "订单无故取消"}
+{"query": "能取消吗 那我找谁", "label": "in_kb", "provenance": "qa_test", "note": "如何取消订单"}
+{"query": "送货什么时间能到 联系一下送货的，什么时候能到，等一天了", "label": "in_kb", "provenance": "qa_test", "note": "配送周期"}
+{"query": "你好，请问我这个货物 [金额] 还能准时送达吗 现在下单还便宜了 [数字] 块", "label": "in_kb", "provenance": "qa_test", "note": "配送周期"}
+{"query": "为什么申请开票被驳回 我们都收货了啊", "label": "in_kb", "provenance": "qa_test", "note": "发票退换修改"}
+{"query": "就是不用我拒收是吗 ? 什么时候能审核好", "label": "in_kb", "provenance": "qa_test", "note": "拒收"}
+{"query": "[数字] 元是现金嘛，还是什么，就是明天给快递员就行了是吧。", "label": "in_kb", "provenance": "qa_test", "note": "返回方式"}
+{"query": "我申请退货，换个品牌", "label": "in_kb", "provenance": "qa_test", "note": "保修返修及退换货政策"}
+{"query": "小金库还款就还到小金库 ? 我是白条支付的，不过我已经主动还款了，也是退到白条里吗", "label": "in_kb", "provenance": "qa_test", "note": "小金库转入转出"}
+{"query": "怎么理赔 机器坏了，叫不了京东快递员 那我不取消订单", "label": "in_kb", "provenance": "qa_test", "note": "物流损"}
+{"query": "发票开了吗 开了没有", "label": "in_kb", "provenance": "qa_test", "note": "查看发票"}
+{"query": "还是现在 ?", "label": "in_kb", "provenance": "qa_test", "note": "联系配送"}
+{"query": "那麻烦你请改为退货，因为我已在前二天购一瓶了。 售后服务单号 : [数字] 这个能否改为退货 ?", "label": "in_kb", "provenance": "qa_test", "note": "服务单修改"}
+{"query": "此订单客户是需要上门取件退货的售后客服处理成上门换新了 现在需要怎么修改", "label": "in_kb", "provenance": "qa_test", "note": "服务单修改"}
+{"query": "您这边能帮我备注吗 ?", "label": "in_kb", "provenance": "qa_test", "note": "预约配送时间"}
+{"query": "你好，请问秒杀价的商品是否还能使用京东满减优惠券、", "label": "in_kb", "provenance": "qa_test", "note": "优惠券使用"}
+{"query": "物流 今天能送吗", "label": "in_kb", "provenance": "qa_test", "note": "配送周期"}
+{"query": "这个限制条件指的是什么意思呢 ?", "label": "in_kb", "provenance": "qa_test", "note": "优惠券使用"}
+{"query": "我直接取消服务订单可以吗 我们都已经换好货了", "label": "in_kb", "provenance": "qa_test", "note": "是否提供发票"}
+{"query": "不是质保的事，这个移动硬盘里面不是一个 [金额] 寸的硬盘吗 ? 就比如我的盒子时间长了接口不好了，我能否拆出硬盘更换硬盘盒继续使用 你可以问一下售后的，就这个移动硬盘盒子和硬盘的接口是插上去的还是焊接在一起的。 这个移动硬盘硬盘和硬盘盒可以分开的吗 ?", "label": "in_kb", "provenance": "qa_test", "note": "属性咨询"}
+{"query": "有个快递申请退款 我的快递呗快递公司给签收了，商家让我找你们平台申请退款", "label": "in_kb", "provenance": "qa_test", "note": "申请退款"}
+{"query": "[金额] 到期，一个星期都不到", "label": "in_kb", "provenance": "qa_test", "note": "配送周期"}
+{"query": "我们想进行企业采购，然后走线下付款", "label": "in_kb", "provenance": "qa_test", "note": "企业用户"}
+{"query": "您好 ! 我的一个订单中，订了沙琪玛和腊肠，沙琪玛收到了，但腊肠没收到，订单状态已经是签收了，我该怎么办 ? 订了两包，一根都没见着", "label": "in_kb", "provenance": "qa_test", "note": "订单签收异常"}
+{"query": "通常需要多久", "label": "in_kb", "provenance": "qa_test", "note": "返修退换货处理周期"}
+{"query": "我取消了一个订单在昨天 我看拆分的一个字订单还在配送中 是不是已经拦截了", "label": "in_kb", "provenance": "qa_test", "note": "拆分订单"}
+{"query": "有哪款是用螺丝固定在墙上的 我怕胶粘的不牢固会掉", "label": "in_kb", "provenance": "qa_test", "note": "商品检索"}
+{"query": "今天天气怎么样", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "明天会下雨吗", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "帮我写一首关于春天的诗", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "推荐一部好看的电影", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "你能讲个笑话吗", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "给我讲个睡前故事", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "教我怎么做红烧肉", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "麦当劳外卖怎么点", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "附近有什么好吃的", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "帮我订一张去上海的机票", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "高铁票怎么改签", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "北京的旅游景点有哪些", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "怎么学好英语口语", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "帮我翻译一句英文", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "我的房贷利率是多少", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "今天股市会涨吗", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "比特币现在多少钱", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "你们公司股票代码是多少", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "帮我算一下 37 乘以 89", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "3 的平方根是多少", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "世界和平是什么意思", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "人为什么会有梦想", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "我失恋了怎么办", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "怎么和老板提加薪", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "明天是星期几", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "现在几点了", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "你是谁开发的", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "你会下围棋吗", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "帮我写一段 Python 代码", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "什么是对称加密", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "推荐几本好看的小说", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "周杰伦的新歌叫什么", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "今晚的球赛几点开始", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "世界杯冠军是谁", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "减肥应该吃什么", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "怎么练出腹肌", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "感冒了要吃什么药", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "我的车该保养了", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "汽车胎压多少合适", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "怎么养一只猫", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "猫粮哪个牌子好", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "我的手机屏幕碎了去哪修", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "iphone 15 多少钱", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "华为和小米哪个好", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "怎么申请签证", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "护照过期了怎么办", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "水电费怎么交", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "怎么交个人所得税", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "帮我写一份简历", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "面试时怎么自我介绍", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "世界上最高的山是哪座", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "地球到月球有多远", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "帮我起个男孩的名字", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "结婚纪念日送什么礼物", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "情人节是几月几号", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "怎么学弹吉他", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "钢琴考级有什么用", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "怎么减肥最快", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "为什么晚上睡不着", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "帮我推荐一首好听的歌", "label": "out_kb", "provenance": "handwritten", "note": ""}
+{"query": "我买的 iPhone 15 能七天无理由退货吗", "label": "in_kb", "provenance": "boundary", "note": ""}
+{"query": "我买的猫粮拆封了还能退吗", "label": "in_kb", "provenance": "boundary", "note": ""}
+{"query": "我老公送的口红不合适能换色号吗", "label": "in_kb", "provenance": "boundary", "note": ""}
+{"query": "买错了尺码怎么换货", "label": "in_kb", "provenance": "boundary", "note": ""}
+{"query": "双十一买的东西什么时候发货", "label": "in_kb", "provenance": "boundary", "note": ""}
+{"query": "快递到了但我出差不在家怎么办", "label": "in_kb", "provenance": "boundary", "note": ""}
+{"query": "买的护肤品过敏了能退吗", "label": "in_kb", "provenance": "boundary", "note": ""}
+{"query": "下单后多久发货", "label": "in_kb", "provenance": "boundary", "note": ""}
+{"query": "商品降价了能补差价吗", "label": "in_kb", "provenance": "boundary", "note": ""}
+{"query": "退款审核要多久", "label": "in_kb", "provenance": "boundary", "note": ""}

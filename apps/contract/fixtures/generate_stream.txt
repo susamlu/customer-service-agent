@@ -1,0 +1,8 @@
+data: {"type": "token", "text": "您好，"}
+
+data: {"type": "token", "text": "订单 SO123456"}
+
+data: {"type": "token", "text": "已到杭州，预计今天派送。"}
+
+data: {"type": "done", "reply": "您好，订单 SO123456已到杭州，预计今天派送。", "elapsed": 0.52}
+

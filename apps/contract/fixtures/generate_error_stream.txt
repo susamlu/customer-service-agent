@@ -1,0 +1,4 @@
+data: {"type": "token", "text": "半句"}
+
+data: {"type": "error", "code": "STREAM_INTERRUPTED", "message": "生成中断", "partial": "半句"}
+
