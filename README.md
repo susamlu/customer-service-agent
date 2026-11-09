@@ -22,9 +22,9 @@
 
 目标不是教程级 demo，而是把真实客服系统里的工程取舍写清楚：**哪些环节值得训练模型，哪些交给 LLM，哪些应该砍掉**。下面每一节都对应一个做过对照实验的决策，数字取自 `docs/experiments.md`。
 
-| 意图识别（预热后单次前向） | 模型服务常驻内存 | 生成首字延迟 | boundary 必中率 |
+| 意图识别（预热后单次前向） | 模型服务常驻权重 | 生成首字延迟 | boundary 必中率 |
 |---|---|---|---|
-| **15–20 ms** | **0.44 GB** | **~1.0 s** | **0.867** |
+| **15–20 ms** | **0.5 GB** | **~1.0 s** | **0.867** |
 
 ## 架构
 
@@ -72,7 +72,7 @@ flowchart TD
 - **网关负责编排**：能力集调度、订单匹配、上下文合并、prompt 拼装、SSE 事件
 - **意图先于数据访问**：能力集决定「要不要查订单、要不要检索」，门控保证工具不被误触发
 
-**生成层只走 API。** 客服问答 QPS 不高，本地部署生成模型要多花 GB 级内存和冷启动时间，而 DeepSeek 流式首字约 1s、全链约 1.2s 已经够用。所以生成固定走 API，缺 key 时启动直接失败，不做本地降级，模型服务常驻只有 BERT + bge。
+**生成层只走 API。** 客服问答 QPS 不高，本地部署生成模型要多花 GB 级内存和冷启动时间，而 DeepSeek 流式首字约 1s、全链 1.2–1.5s 已经够用（E2E 单次样本 1.18s，100 条端到端评测均值 1545ms）。所以生成固定走 API，缺 key 时启动直接失败，不做本地降级，模型服务常驻只有 BERT + bge。
 
 ## 两个工程取舍
 
@@ -95,7 +95,7 @@ flowchart TD
 
 订单号等实体由同层的规则抽取，不额外编码。41 类主题到能力集的映射是显式 YAML，CI 校验无缺键，不让模型「顺便」决定调用什么工具。
 
-单次前向 15–20ms，线上常驻只剩 BERT + bge = **0.44GB**（实测 RSS）——意图链路从旧方案的百毫秒级降到 15ms 级。
+单次前向 15–20ms，线上常驻只剩 BERT + bge，权重文件合计约 **505 MB**——意图链路从旧方案的百毫秒级降到 15ms 级。
 
 ### 2. 精排默认关掉（保留可开启路径）
 
@@ -222,7 +222,7 @@ curl -s http://127.0.0.1:8000/metrics | grep model_service
 - `build_route_eval.py`：构造 300 条独立路由评测集（能力集多标签标注，与训练集隔离）
 - `train_intent_multitask.py`：多任务 BERT（route 3 × sigmoid + topic 41 × softmax）联合训练
 - `train_rerank.py` / `build_rerank.py`：精排微调，负例分三级难度（同会话硬负例 > 同意图 > 随机）
-- `intent_capability_map.yaml`：41 类主题 → 能力集显式映射，CI 校验无缺键
+- `intent_capability_map.yaml`：41 类主题 → 能力集显式映射，CI 校验无缺键；`check_route_drift.py` 夜间比对模型实际输出与声明，漂移只告警
 
 每个脚本的输入、产物与门槛见 [ml/experiments/README.md](ml/experiments/README.md)。
 
@@ -230,6 +230,7 @@ curl -s http://127.0.0.1:8000/metrics | grep model_service
 
 - [docs/architecture.md](docs/architecture.md) — 架构、接口契约、决策台账（唯一事实来源）
 - [docs/experiments.md](docs/experiments.md) — 数据构建、训练与全部评测数字
+- [docs/openapi.json](docs/openapi.json) — 模型服务 OpenAPI 契约，改接口后必须重跑 `dump_openapi.py` 并提交
 - [apps/inference](apps/inference) — 模型服务与 API
 - [ml/experiments](ml/experiments) — 可复现的训练与评测脚本
 

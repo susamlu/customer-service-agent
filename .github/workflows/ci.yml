@@ -8,7 +8,8 @@ name: ci
 #   - capability  主题→能力映射完整性与路由评测集不变量
 #
 # 每晚 / 手动（模型权重不在 PR 缓存里，避免每次 PR 拉 400MB）：
-#   - eval        route / rerank / retrieval 三条评估门槛，任一不达标非零退出
+#   - eval        route / rerank / retrieval 三条评估门槛，任一不达标非零退出；
+#                 附 route 漂移检测，只告警不拦截
 #   - e2e         真实栈 HTTP/SSE 黑盒（订单 / 知识 / 转人工 / 并行）
 #
 # 模型权重通过 Git LFS 或 CI 缓存落到 ml/models/；缺失时 eval 任务直接失败，
@@ -99,6 +100,14 @@ jobs:
             echo "::error::缺少 ml/models/intent-multitask-bert，评估门槛无法执行。请用 Git LFS 或 CI 缓存提供权重。"
             exit 1
           fi
+      # 行为层校验：YAML 只是训练标签来源，运行时能力集来自 route 头（architecture.md
+      # §4.3）。改了 YAML 没重训、重训了没同步 YAML、换了底座模型，静态校验都不会
+      # 报错。这里跑真实分类器比对，但**只告警不拦截**——漂移本身不等于错误，可能
+      # 是模型学到更准的映射，需要人看命中率再决定动 YAML 还是重训。
+      # 放在门槛之前：门槛失败会中止后续步骤，而漂移表对定位门槛失败有参考价值。
+      - name: Route drift (YAML declaration vs route head, warning only)
+        continue-on-error: true
+        run: python ml/experiments/check_route_drift.py --device cpu --json /tmp/route-drift.json
       - name: Route gate (boundary R ≥ 0.85 / heldout subset ≥ 0.80 / order P ≥ 0.88 / human R ≥ 0.75)
         run: python ml/experiments/eval_router.py
       - name: Rerank gate (pairwise ≥ 0.774)
