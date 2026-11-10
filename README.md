@@ -7,7 +7,7 @@
 [![CI](https://github.com/susamlu/customer-service-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/susamlu/customer-service-agent/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/python-3.11-blue)
 ![Java](https://img.shields.io/badge/java-17-blue)
-![Tests](https://img.shields.io/badge/tests-203%20passed-brightgreen)
+![Tests](https://img.shields.io/badge/tests-205%20passed-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 ![聊天界面](docs/images/ui-chat.png)
@@ -20,9 +20,9 @@
 
 全链路独立完成：数据构建、模型训练与评测、Python 模型服务、Spring Boot 网关、React 前端。底座模型与训练语料来自公开资源（见「数据与训练」）。
 
-目标不是教程级 demo，而是把真实客服系统里的工程取舍写清楚：**哪些环节值得训练模型，哪些交给 LLM，哪些应该砍掉**。下面每一节都对应一个做过对照实验的决策，数字取自 `docs/experiments.md`。
+目标不是教程级 demo，而是把真实客服系统里的工程取舍写清楚：**哪些环节值得训练模型，哪些交给 LLM，哪些用规则就够**。下面每一节都对应一个做过对照实验的决策，数字取自 `docs/experiments.md`。
 
-| 意图识别（预热后单次前向） | 模型服务常驻权重 | 生成首字延迟 | boundary 必中率 |
+| 意图识别（预热后单次前向） | 模型权重（不含精排） | 生成首字延迟 | boundary 必中率 |
 |---|---|---|---|
 | **15–20 ms** | **0.5 GB** | **~1.0 s** | **0.867** |
 
@@ -72,41 +72,46 @@ flowchart TD
 - **网关负责编排**：能力集调度、订单匹配、上下文合并、prompt 拼装、SSE 事件
 - **意图先于数据访问**：能力集决定「要不要查订单、要不要检索」，门控保证工具不被误触发
 
-**生成层只走 API。** 客服问答 QPS 不高，本地部署生成模型要多花 GB 级内存和冷启动时间，而 DeepSeek 流式首字约 1s、全链 1.2–1.5s 已经够用（E2E 单次样本 1.18s，100 条端到端评测均值 1545ms）。所以生成固定走 API，缺 key 时启动直接失败，不做本地降级，模型服务常驻只有 BERT + bge。
+**生成层只走 API。** 客服问答 QPS 不高，本地部署生成模型要多花 GB 级内存和冷启动时间，而 DeepSeek 流式首字约 1s、全链 1.2–1.5s 已经够用（E2E 单次样本 1.18s，100 条端到端评测均值 1545ms）。所以生成固定走 API，缺 key 时启动直接失败，不做本地降级，模型服务只加载 BERT + bge 权重。
 
 ## 两个工程取舍
 
-### 1. 意图识别：训练一个小模型，不调 LLM，也不堆层
+### 1. 意图识别：训练一个小模型，不直接调 LLM
 
-**不调 LLM。** 最初的版本在规则 + BERT 之上加了一层 LLM 兜底，专门处理模型低置信的情况。量化之后删掉了：
+**不直接调 LLM。** 意图是固定标签空间的短文本分类：链路要的是 3 个能力标签的独立概率（接每标签阈值）和 41 类主题分布（接检索分区），不是一段自然语言答案。LLM 能满足，但代价不对等：
 
-- 300 条评测里只触发 **3 次（1%）**，收益集中在 1 条问法
-- 同类问法跨轮表现不稳定，无法当稳定信号
-- 会注入 order 假阳性，把 order precision 压到 CI 门槛以下
+- **延迟**：意图在链路最上游，每次提问都要跑。BERT 一次前向 15–20 ms 且本地确定；LLM 一次调用几百 ms 起，还要叠加网络往返与限流
+- **稳定性**：分类依赖可复现的概率与阈值行为，LLM 同类问法跨轮漂移、概率校准差，CI 回归线会被抖动打穿
+- **成本**：每次提问一次调用是持续开销，小模型是一次性训练成本
+- **证据**：给 LLM 加一层低置信兜底（它最该起作用的区段），300 条评测只触发 **3 次（1%）**，收益集中在 1 条问法，还会注入 order 假阳性把 order precision 压到 CI 门槛以下。兜底尚且不划算，全量替代更不成立
 
-**不堆层。** 更早的链路是「规则 → 向量检索 → 0.5B → 3B」的零训练启发式组合。问题不是某一层不准，而是**层间错误累积**：上游误判，下游没有否决权；同时线上常驻内存约 10GB，每一层都有独立的延迟尖峰。
+反过来，标签空间开放或频繁变化、没有标注数据、意图判断需要复杂推理且 QPS 很低的场景，直接调 LLM 反而省事；这些条件本项目都不满足。
 
-现在的做法是 L0 正则 + L1 一个多任务 BERT。一次前向同时输出两个 head：
+意图识别是 L0 正则 + L1 一个多任务 BERT 两层，共享一个编码器，一次前向同时输出两个 head：
 
 | head | 输出 | 用途 |
 |---|---|---|
 | route | 3 × sigmoid（knowledge / order / human） | 决定能力集 |
 | topic | 41 × softmax | 检索分区加权 |
 
-订单号等实体由同层的规则抽取，不额外编码。41 类主题到能力集的映射是显式 YAML，CI 校验无缺键，不让模型「顺便」决定调用什么工具。
+订单号等实体由同层的规则抽取，不额外编码。能力集由 route 头直接输出；「主题 → 能力」的显式 YAML 只作为训练标签来源，CI 校验无缺键，运行时不做查表。模型只决定抽象能力，具体调用哪个工具由网关编排。
 
-单次前向 15–20ms，线上常驻只剩 BERT + bge，权重文件合计约 **505 MB**——意图链路从旧方案的百毫秒级降到 15ms 级。
+单次前向 15–20ms，线上只加载 BERT + bge 权重，合计约 **505 MB**（不含精排）。
 
 ### 2. 精排默认关掉（保留可开启路径）
 
-这里曾有两个口径给出相反结论，值得如实记录：
+这里的两组口径回答的是两个不同的问题，值得如实记录：
 
 | 口径 | noop（不精排） | 微调精排 | 零样本精排 |
 |---|---|---|---|
 | intent-hit top-2 命中率（线上最相关） | **0.5477** | 0.5299 | 0.5026 |
-| pairwise 硬负例准确率 | — | **0.848** | 0.774 |
+| pairwise 准确率（总体） | — | **0.848** | 0.774 |
 
-intent-hit 口径下不精排最好，因为这个口径的相关集合就是同主题召回，精排没有可区分的信息；pairwise 口径证明微调精排确实能压过零样本 **+7.44pp**（intent-hit 口径上微调也比零样本高 2.73pp）。结论：
+intent-hit 口径下不精排最好，因为这个口径的相关集合就是同主题召回，精排没有可区分的信息；pairwise 口径证明微调精排确实能压过零样本 **+7.44pp**（intent-hit 口径上微调也比零样本高 2.73pp）。注意 0.848 / 0.774 是含随机负例的**总体**准确率，按负例难度拆开差距更大：同会话负例微调 0.7986、零样本 0.7115；同意图负例微调 0.7421、零样本 0.6533。
+
+两组指标并不矛盾：intent-hit 比的是「精排 vs 不精排」，pairwise 比的是「微调 vs 零样本」——后者没有 noop 这一行，证明不了精排优于不精排。它们回答的是「现在要不要开」和「要开时用哪一版」两个问题。
+
+结论：
 
 - 当前场景（同主题召回为主）**精排不值得 1.1GB 权重 + 500ms 预算**，线上默认 `NoopReranker`，直接取召回序
 - 若场景转向簇内硬负例区分，用微调版本而不是零样本
@@ -114,7 +119,7 @@ intent-hit 口径下不精排最好，因为这个口径的相关集合就是同
 
 ## 评测门槛
 
-核心链路有 CI 回归线，不达标直接失败；生成与可答性评测花 token 或依赖外网，手动或夜间执行。
+核心链路有 CI 回归线，不达标直接失败；生成与可答性评测花 token 或依赖外网，**只能在本地手动执行**（CI 夜间 job 只跑路由、精排、检索、漂移）。
 
 | 环节 | 当前基线 | CI 回归线 | 脚本 |
 |---|---|---|---|
@@ -124,12 +129,12 @@ intent-hit 口径下不精排最好，因为这个口径的相关集合就是同
 | human recall | 0.793 | ≥ 0.75 | 同上 |
 | 重排 pairwise | 0.848 | ≥ 0.774（零样本基线） | `ml/experiments/eval_rerank.py` |
 | 检索 recall@10（线上口径） | 0.696 | ≥ 0.68 | `ml/experiments/eval_retrieval.py` |
-| 生成 faithfulness（100 条端到端） | 4.71 | ≥ 4.0（夜间，不进 per-commit） | `ml/experiments/eval_generation.py` |
+| 生成 faithfulness（100 条端到端） | 4.71 | ≥ 4.0（手动，不进 CI） | `ml/experiments/eval_generation.py` |
 | 生成贴合度 cosine | 0.622 | ≥ 0.572（回归线） | 同上 |
 | 可答性误拦（域内 130 条） | 0.015 | ≤ 0.05（手动） | `ml/experiments/eval_answerability.py` |
 | 可答性拦截（域外 60 条） | 0.700 | ≥ 0.50（手动） | 同上 |
 
-路由基线是**门控前**口径（规则 + BERT，无兜底），也是 CI 退出码的唯一依据；门控后的完整口径手动跑 `eval_router.py --gate on`。生成评测花 token 且依赖外网，只在夜间或手动执行。全部数字与消融过程见 [docs/experiments.md](docs/experiments.md)。
+路由基线是**门控前**口径（规则 + BERT），也是 CI 退出码的唯一依据；门控后的完整口径手动跑 `eval_router.py --gate on`。生成评测花 token 且依赖外网，只在本地手动执行。全部数字与消融过程见 [docs/experiments.md](docs/experiments.md)。
 
 重排门槛保的是「微调路径可开启、且相对零样本不退化」，不是线上指标——线上默认 noop，不加载精排权重。
 
@@ -154,7 +159,7 @@ export DEEPSEEK_API_KEY=sk-...   # 必填；缺失时启动脚本直接报错退
 
 ```bash
 .venv/bin/python3 -m pytest apps/inference/tests -q      # 88 passed，秒级（无 DATABASE_URL 时 1 条 parity 测试跳过）
-JAVA_HOME=$(/usr/libexec/java_home -v 17) mvn -f apps/backend/pom.xml test   # 115 条单测 + Java↔Python 契约
+JAVA_HOME=$(/usr/libexec/java_home -v 17) mvn -f apps/backend/pom.xml test   # 117 条单测 + Java↔Python 契约
 ```
 
 推理层单测与网关契约测试都不加载模型权重，几分钟内可跑完。完整 Demo 另需约 3GB 权重（ModelScope 下载底座 + 微调产物，见下方环境准备）。
@@ -222,7 +227,7 @@ curl -s http://127.0.0.1:8000/metrics | grep model_service
 - `build_route_eval.py`：构造 300 条独立路由评测集（能力集多标签标注，与训练集隔离）
 - `train_intent_multitask.py`：多任务 BERT（route 3 × sigmoid + topic 41 × softmax）联合训练
 - `train_rerank.py` / `build_rerank.py`：精排微调，负例分三级难度（同会话硬负例 > 同意图 > 随机）
-- `intent_capability_map.yaml`：41 类主题 → 能力集显式映射，CI 校验无缺键；`check_route_drift.py` 夜间比对模型实际输出与声明，漂移只告警
+- `intent_capability_map.yaml`：41 类主题 → 能力集的显式映射，训练标签的唯一来源（运行时不做查表），CI 校验无缺键；`check_route_drift.py` 夜间比对模型实际输出与声明，漂移只告警
 
 每个脚本的输入、产物与门槛见 [ml/experiments/README.md](ml/experiments/README.md)。
 

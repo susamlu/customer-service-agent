@@ -16,7 +16,7 @@ flowchart TD
 
     subgraph GW["Spring Boot 网关（Java 17 / Boot 3.3.5）"]
         GF["GuardFilter<br/>认证 · 限流 · 长度上限"]
-        SS["SessionStore<br/>InMemory | Redis · TTL 淘汰"]
+        SS["SessionStore<br/>InMemory · 30min 空闲淘汰<br/>（接口化后可换 Redis）"]
         CP["CapabilityPlanner<br/>调 plan 取能力集 · 门控在模型服务侧<br/>order 需 orderId 或会话上下文"]
         FO["FanOut<br/>并行能力 · 有界池 · 满即降级"]
         CA["ContextAssembler<br/>去重 · 裁剪 · 来源标注 · 冲突提示"]
@@ -258,10 +258,10 @@ topics:
   价保申请流程:       [knowledge]
   物流全程跟踪:       [order, knowledge]   # 既要查物流，也要讲时效政策
   订单状态解释:       [order]
-  修改订单:           [order]
-  如何取消订单:       [order]
+  修改订单:           [order, knowledge]   # 改单依赖订单当前状态
+  如何取消订单:       [order, knowledge]   # 取消依赖订单状态
   订单签收异常:       [order, knowledge]
-  服务单查询:         [order]
+  服务单查询:         [order, knowledge]   # 服务单号与订单号不同源，门控兜底
   联系客服:           [human]
   联系客户:           [human]
   联系配送:           [human]
@@ -351,7 +351,7 @@ handle(session, query):
 | order | 300ms（真实 API 场景 800ms） | 丢弃该能力，继续生成，答案里注明「订单信息暂时不可用」 |
 | knowledge retrieve | 500ms | 返回空 → 降级为纯知识回答 |
 | rerank | 500ms | 跳过重排，直接用召回顺序 |
-| generate | 无总超时，但要求首字 3s 内到达 | 首字超时返回错误，已吐出的内容保留；不做本地降级 |
+| generate | 无总超时 | 只记录首字到达时刻（`first_token_seconds` 指标），不做强制中断；流中断时保留已吐出的内容，不做本地降级 |
 
 > 精排默认走 `NoopReranker`（直接取召回序，不加载 1.1GB 权重）。是否启用微调精排见
 > [experiments.md](./experiments.md)「精排取舍消融」；启用后超时按上表降级为召回序。
@@ -571,7 +571,7 @@ pytest   apps/inference/tests 88 passed, 1 skipped（无 DATABASE_URL 时 parity
 | 路由低置信（能力集为空） | 「能否具体描述一下您的问题？」 | 记 `ROUTE_LOW_CONFIDENCE` |
 | 订单号不存在（纯订单查询） | 「没有找到订单 SO123456，请核对后重试」 | **禁止回退到其他订单** |
 | 订单号不存在（订单+知识并行） | 生成回答，上下文注入「订单号不存在，不要编造」 | 知识结果照常合并，仍**禁止回退到其他订单** |
-| 检索空 | 用生成模型的常识回答，并标注「知识库无匹配」 | 记 `RETRIEVAL_EMPTY` |
+| 检索空 | 固定话术 `AnswerabilityGate.NO_CONTEXT_REPLY`（「暂时没有查到可靠的相关说明…可回复转人工」） | `log.warn` 记 `RETRIEVAL_EMPTY`，可答性闸门判 `NO_CONTEXT`，**不调生成** |
 | DeepSeek 429 | 「服务繁忙，请稍后重试」 | 退避 1 次后返回 `UPSTREAM_RATE_LIMITED` |
 | DeepSeek 半截流 | 已输出部分保留 + 「回答中断，请重试」 | 记 `STREAM_INTERRUPTED` |
 | 客户端断开 | — | 取消上游请求，停止计费 |
@@ -656,8 +656,8 @@ flowchart TB
 | human recall | ≥ 0.90 | ≥ 0.75 | 0.793 | 灰区召回 0.647，扩规则与换底座进 TODO |
 | rerank pairwise | ≥ 0.774 | 0.774 | 0.848 | 不得低于零样本基线 |
 | 检索 recall@10 | ≥ 0.72 | ≥ 0.68 | 0.6962 | 线上口径：KB=`qa_train`，路由 topic 分区 +0.05；纯向量 0.6637 |
-| 生成 faithfulness | ≥ 4.0 | 夜间 | 4.71 | 100 条端到端，LLM 判分（§10.4） |
-| 生成 cosine | — | 夜间 | 0.622 | 回归线 0.572 |
+| 生成 faithfulness | ≥ 4.0 | 手动 | 4.71 | 100 条端到端，LLM 判分（§10.4） |
+| 生成 cosine | — | 手动 | 0.622 | 回归线 0.572 |
 | 可答性 误拦（qa_test） | ≤ 0.05 | — | 0.017 | 可答问题被判 no_context；手动回归，不进 CI（§5.4） |
 | 可答性 拦截（out_kb） | ≥ 0.50 | — | 0.700 | 域外问题被判 no_context；漏拦靠 weak 兜底 |
 | 首字延迟 P95 | ≤ 3s | — | 0.86s（DeepSeek 单次样本） | 需持续采样再定 P95 |
@@ -720,7 +720,7 @@ PYTHONPATH=apps:ml/runtime .venv/bin/python3 ml/experiments/eval_generation.py \
 | `cosine` 均值 | 基线 0.622，回归线 0.572 | 回归门槛 = 基线 − 0.05（绝对）或 −5%（相对），取更宽松者 |
 | `total_ms` P95 | ≤ 3000ms，只报告 | 网络抖动大，不用作退出码条件 |
 
-退出码：硬门槛任一不通过返回 1。**不进 per-commit CI**——每次跑要花 DeepSeek token 且依赖外网，放夜间任务或手动回归；`--judge off` 可作无 token 的冒烟。
+退出码：硬门槛任一不通过返回 1。**不进任何 CI**——每次跑要花 DeepSeek token 且依赖外网，只能本地手动回归；CI 夜间 job 不含生成评测。`--judge off` 可作无 token 的冒烟。
 
 #### 已知限制
 
@@ -802,4 +802,4 @@ generate  → 首字延迟 / token 数 / 总耗时
 | 多租户 / 权限模型 | 需产品定义，非技术选型 |
 | 向量库运维（分片、备份、调参） | PgVectorRetriever 已可接入（§7）；分片 / 备份 / 索引调参不进参考范围 |
 | 流式 token 计费 | DeepSeek 侧能力，网关只做限流 |
-| 前端重写 | 复用现有前端，只调整 SSE 事件字段 |
+| 前端重写 | 参考实现自带一个最小 React 前端，只消费 SSE 事件；不做设计系统 / 多端 / 国际化 |

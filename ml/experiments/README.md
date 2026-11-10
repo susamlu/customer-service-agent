@@ -50,7 +50,7 @@ DATABASE_URL=postgresql://csagent:csagent@localhost:5432/csagent \
 | `eval_retrieval.py` | 召回。`pure`（纯向量）与 `served`（topic 分区 +0.05）两组 | served recall@10 ≥ 0.68 | 是 |
 | `eval_rerank.py` | 重排 pairwise accuracy + MRR@2，按负例难度分组 | ≥ 0.774（零样本基线） | 是 |
 | `eval_rerank_ablation.py` | noop / zero_shot / finetuned 三组比 top-2 命中 | 无硬门槛，回答「1.1GB + 500ms 值不值」 | 否 |
-| `eval_generation.py` | 走完整链路拿回答，独立 httpx 调 judge 三维打分 | faithfulness ≥ 4.0；花 token + 外网 | 否（夜间/手动） |
+| `eval_generation.py` | 走完整链路拿回答，独立 httpx 调 judge 三维打分 | faithfulness ≥ 4.0；花 token + 外网 | 否（仅手动） |
 | `eval_answerability.py` | 可答性闸门。top1 分数三档分流 | 域内误拦 ≤ 5%，域外拦截 ≥ 50% | 否（需权重 + MPS） |
 
 `eval_generation.py` 有三个必须和网关对齐的锚点：系统 prompt 直接读

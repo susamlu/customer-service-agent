@@ -14,14 +14,14 @@
 | 路由 | human recall | 0.7931 | ≥ 0.75 | 同上 |
 | 检索 | recall@10（线上 served 口径） | 0.6962 | ≥ 0.68 | `ml/experiments/eval_retrieval.py` |
 | 精排 | pairwise accuracy | 0.8484 | ≥ 0.7740（零样本基线） | `ml/experiments/eval_rerank.py` |
-| 生成 | faithfulness（100 条端到端） | 4.71 | ≥ 4.0（夜间） | `ml/experiments/eval_generation.py` |
-| 生成 | cosine | 0.622 | ≥ 0.572（夜间） | 同上 |
+| 生成 | faithfulness（100 条端到端） | 4.71 | ≥ 4.0（手动） | `ml/experiments/eval_generation.py` |
+| 生成 | cosine | 0.622 | ≥ 0.572（手动） | 同上 |
 | 可答性 | 误拦（in_kb 130 条） | 0.015 | ≤ 0.05（手动） | `ml/experiments/eval_answerability.py` |
 | 可答性 | 拦截（out_kb 60 条） | 0.700 | ≥ 0.50（手动） | 同上 |
 | 映射 | route 头 vs YAML 声明漂移（41 主题 × 3 能力） | 0 处 | 只告警，不拦截 | `ml/experiments/check_route_drift.py` |
 | 向量库 | InMemory ↔ PgVector 一致性 | 10/10 query 通过 | — | `apps/inference/tests/test_pgvector_parity.py` |
 
-路由是**门控前**口径（规则 + BERT，不经过 `apply_gate`），也是 CI 退出码的唯一依据；门控后口径手动跑 `eval_router.py --gate on`。生成与可答性评测花 token 或依赖权重，手动或夜间执行。
+路由是**门控前**口径（规则 + BERT，不经过 `apply_gate`），也是 CI 退出码的唯一依据；门控后口径手动跑 `eval_router.py --gate on`。生成与可答性评测花 token 或依赖外网，**只能在本地手动执行**——CI 的夜间 eval job 只跑漂移、路由、精排、检索四项。
 
 ## 目录
 
@@ -225,7 +225,7 @@ parity   10/10 query 通过（每条 top-10 交集 ≥8）
 
 路由、检索、精排各有评测，但都没有回答「整条链路拼起来，用户看到的那句话对不对」。`eval_generation.py` 补这一环，样本 `qa_test.jsonl` 按 seed 42 采 100 条（过滤空问题与答案 < 10 字）。两条口径跑同一批样本：
 
-- **pipeline**：意图 → 检索（top10，topic +0.05）→ 精排（默认 noop，评测可选开）→ `[知识]` 上下文（各限 90 字）→ DeepSeek。端到端数字，对应线上。
+- **pipeline**：意图 → 检索（top10，topic +0.05）→ 精排（`eval_generation.py` 恒加载微调精排，**不是**线上的 noop 口径）→ `[知识]` 上下文（各限 90 字）→ DeepSeek。端到端数字，注意与线上 noop 的差异只在精排这一步。
 - **oracle**：gold answer 直接当上下文（不截断），只测生成与 prompt 的天花板，用来把「检索错」和「生成差」分开。
 
 三条运行时对齐（不复制、随线上自动变）：系统 prompt 读 `apps/backend/src/main/resources/prompts/chat-system.txt`；用户消息复刻 `Context + "\n\n用户问题：" + query`；知识块复刻 `ContextAssembler` 的 `[知识] ` 前缀、2 条上限、90 字截断。
@@ -366,8 +366,8 @@ out_kb         60 |      0.700   0.217    0.083
 # 检索（served = 线上口径）
 .venv/bin/python3 ml/experiments/eval_retrieval.py
 
-# 精排 pairwise
-.venv/bin/python3 ml/experiments/eval_rerank.py
+# 精排 pairwise（0.8484 是微调版权重；不加 --model 跑的是零样本基线 0.7740）
+.venv/bin/python3 ml/experiments/eval_rerank.py --model ml/models/rerank-finetuned
 # 精排取舍消融
 .venv/bin/python3 ml/experiments/eval_rerank_ablation.py
 
@@ -380,7 +380,8 @@ PYTHONPATH=apps:ml/runtime .venv/bin/python3 ml/experiments/eval_answerability.p
 
 # 向量库 parity（需 DATABASE_URL 与已灌库的 pgvector）
 docker compose -f apps/deploy/docker-compose.yml --profile pgvector up -d postgres
-.venv/bin/python3 ml/experiments/build_vector_index.py
+DATABASE_URL=postgresql://csagent:csagent@localhost:5432/csagent \
+  .venv/bin/python3 ml/experiments/build_vector_index.py
 DATABASE_URL=postgresql://csagent:csagent@localhost:5432/csagent \
   .venv/bin/python3 -m pytest apps/inference/tests/test_pgvector_parity.py -q
 ```
